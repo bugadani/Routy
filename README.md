@@ -67,11 +67,11 @@ behaviour can be overridden by supplying a subclass of this interface to `onMatc
 
 ### Generating URL-s
 
-Using named routes, Routy can also generate URLs via the `generate($routeName, array $parameters)` method. All of the route's parameters
+Using named routes, Routy can also generate URLs via the `to($routeName, array $parameters)` method. All of the route's parameters
 must be supplied as the second argument, and extra ones will be appended to the URL as further GET parameters.
 
     $router->get('hello/{name}')->name('hello');
-    echo $router->generate('hello', ['name' => 'World', 'extra' => 'hi']); //prints "hello/World?extra=hi"
+    echo $router->to('hello', ['name' => 'World', 'extra' => 'hi']); //prints "hello/World?extra=hi"
 
 ### Resources
 

@@ -134,7 +134,7 @@ class Router
         return $match;
     }
 
-    public function generate($routeName, $parameters = [])
+    public function to($routeName, $parameters = [])
     {
         return $this->routeGenerator->generate($routeName, $parameters);
     }

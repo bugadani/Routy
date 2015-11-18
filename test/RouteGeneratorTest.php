@@ -16,7 +16,7 @@ class RouteGeneratorTest extends \PHPUnit_Framework_TestCase
         $router = new Router();
         $router->get('something/{a}/{b}/{c}')->name('namedRoute');
 
-        $router->generate(
+        $router->to(
             'namedRoute',
             [
                 'a' => 'paramA'
@@ -33,7 +33,7 @@ class RouteGeneratorTest extends \PHPUnit_Framework_TestCase
         $router = new Router($config);
         $router->get('something/{a}/{b}/{c}')->name('namedRoute');
 
-        $generated = $router->generate(
+        $generated = $router->to(
             'namedRoute',
             [
                 'a'     => 'paramA',
@@ -52,7 +52,7 @@ class RouteGeneratorTest extends \PHPUnit_Framework_TestCase
         $router = new Router();
         $router->get('something/{a}/{b}/{c}')->name('namedRoute');
 
-        $generated = $router->generate(
+        $generated = $router->to(
             'namedRoute',
             [
                 'a'     => 'paramA',
