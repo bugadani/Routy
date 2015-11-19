@@ -39,6 +39,30 @@ class Route
         $this->method = $method;
     }
 
+    public function onMatch($onMatch)
+    {
+        if (!$onMatch instanceof DelegateInterface) {
+            $onMatch = new NamedParameterDelegate($onMatch);
+        }
+        $this->onMatch = $onMatch;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @param array $extras
+     */
+    public function setExtras(array $extras)
+    {
+        $this->extras = $extras;
+    }
+
     /**
      * @return DelegateInterface
      */
@@ -78,36 +102,12 @@ class Route
         return $this->path->getPath() === $path;
     }
 
-    public function onMatch($onMatch)
-    {
-        if (!$onMatch instanceof DelegateInterface) {
-            $onMatch = new NamedParameterDelegate($onMatch);
-        }
-        $this->onMatch = $onMatch;
-    }
-
     /**
      * @return string
      */
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @param array $extras
-     */
-    public function setExtras(array $extras)
-    {
-        $this->extras = $extras;
     }
 
     /**

@@ -18,8 +18,6 @@ abstract class ResourceGenerator
     protected $unnamedActions;
     protected $controllerName;
 
-    //General options
-    protected $idPattern;
     private $shallow;
     private $shallowPrefix = '';
     private $shallowPath = '';
@@ -33,8 +31,7 @@ abstract class ResourceGenerator
 
     public function __construct(Router $owner)
     {
-        $this->owner     = $owner;
-        $this->idPattern = $owner->getConfiguration()->defaultParameterPattern;
+        $this->owner = $owner;
     }
 
     public function __destruct()
@@ -66,13 +63,6 @@ abstract class ResourceGenerator
         $only                    = array_flip(func_get_args());
         $this->collectionActions = array_intersect_key($this->collectionActions, $only);
         $this->memberActions     = array_intersect_key($this->memberActions, $only);
-
-        return $this;
-    }
-
-    public function idPattern($idPattern)
-    {
-        $this->idPattern = $idPattern;
 
         return $this;
     }
@@ -117,11 +107,6 @@ abstract class ResourceGenerator
         }
 
         return $this;
-    }
-
-    protected function getPlaceholder($name)
-    {
-        return "{{$name}:{$this->idPattern}}";
     }
 
     public function onMatch($onMatch)
@@ -189,10 +174,9 @@ abstract class ResourceGenerator
                     $initializer->name($unnamedActionName);
                 }
             } else {
-                $initializer = $this->owner->add(
-                    $method,
-                    $actionPathBase . '/' . $action
-                )->name($action . '_' . $namedActionName);
+                $initializer = $this->owner
+                    ->add($method, $actionPathBase . '/' . $action)
+                    ->name($action . '_' . $namedActionName);
             }
             $initializer->extras(
                 [

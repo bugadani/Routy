@@ -17,6 +17,11 @@ class PluralResourceGenerator extends ResourceGenerator
      */
     private $pluralName;
 
+    /**
+     * @var
+     */
+    protected $idPattern;
+
     public function __construct($owner, $singularName, $pluralName)
     {
         parent::__construct($owner);
@@ -36,6 +41,22 @@ class PluralResourceGenerator extends ResourceGenerator
             'destroy' => Request::METHOD_DELETE
         ];
         $this->unnamedActions    = ['index', 'create', 'show', 'update', 'destroy'];
+    }
+
+    public function idPattern($idPattern)
+    {
+        $this->idPattern = $idPattern;
+
+        return $this;
+    }
+
+    protected function getPlaceholder($name)
+    {
+        if ($this->idPattern === null) {
+            return "{{$name}}";
+        } else {
+            return "{{$name}:{$this->idPattern}}";
+        }
     }
 
     /**

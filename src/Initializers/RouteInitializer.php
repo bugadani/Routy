@@ -4,6 +4,7 @@ namespace Routy\Initializers;
 
 use Routy\Route;
 use Routy\RouteContainer;
+use Routy\RouteData;
 
 class RouteInitializer implements RouteInitializerInterface
 {
@@ -17,10 +18,10 @@ class RouteInitializer implements RouteInitializerInterface
      */
     private $route;
 
-    public function __construct(RouteContainer $container, Route $route)
+    public function __construct(RouteContainer $container, $method, RouteData $routeData)
     {
         $this->container = $container;
-        $this->route     = $route;
+        $this->route     = new Route($method, $routeData);
     }
 
     public function extras(array $data)

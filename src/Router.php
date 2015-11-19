@@ -55,7 +55,7 @@ class Router
         $methods          = explode('|', $method);
         $initializerArray = [];
         foreach ($methods as $method) {
-            $initializerArray[] =  new RouteInitializer($this->routeContainer, new Route($method, $routeData));
+            $initializerArray[] =  new RouteInitializer($this->routeContainer, $method, $routeData);
         }
 
         return new AggregateRouteInitializer($initializerArray);
@@ -65,7 +65,7 @@ class Router
     {
         $routeData = $this->routeParser->parse($path);
 
-        return new RouteInitializer($this->routeContainer, new Route($method, $routeData));
+        return new RouteInitializer($this->routeContainer, $method, $routeData);
     }
 
     public function get($path)
@@ -102,18 +102,12 @@ class Router
 
     public function resource($name)
     {
-        $resource = new SingularResourceGenerator($this, $name);
-        $resource->idPattern($this->configuration->defaultParameterPattern);
-
-        return $resource;
+        return new SingularResourceGenerator($this, $name);
     }
 
     public function resources($singularName, $pluralName)
     {
-        $resource = new PluralResourceGenerator($this, $singularName, $pluralName);
-        $resource->idPattern($this->configuration->defaultParameterPattern);
-
-        return $resource;
+        return new PluralResourceGenerator($this, $singularName, $pluralName);
     }
 
     public function match(Request $request)
@@ -124,10 +118,5 @@ class Router
     public function to($routeName, $parameters = [])
     {
         return $this->routeGenerator->generate($routeName, $parameters);
-    }
-
-    public function getConfiguration()
-    {
-        return $this->configuration;
     }
 }
