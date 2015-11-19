@@ -101,10 +101,9 @@ abstract class ResourceGenerator
 
     public function shallowPrefix($prefix)
     {
+        $this->shallowPrefix = $prefix;
         if (strlen($prefix) > 0) {
-            $this->shallowPrefix = $prefix . '_';
-        } else {
-            $this->shallowPrefix = '';
+            $this->shallowPrefix .= '_';
         }
 
         return $this;
@@ -112,10 +111,9 @@ abstract class ResourceGenerator
 
     public function shallowPath($path)
     {
+        $this->shallowPath = $path;
         if (strlen($path) > 0) {
-            $this->shallowPath = $path . '/';
-        } else {
-            $this->shallowPath = '';
+            $this->shallowPath .= '/';
         }
 
         return $this;
@@ -184,19 +182,17 @@ abstract class ResourceGenerator
         $unnamedAdded = false;
         foreach ($actions as $action => $method) {
             if (in_array($action, $this->unnamedActions)) {
+                $initializer = $this->owner->add($method, $actionPathBase);
                 if (!$unnamedAdded) {
                     $unnamedAdded = true;
 
-                    $initializer = $this->owner->addNamed($method, $actionPathBase, $unnamedActionName);
-                } else {
-                    $initializer = $this->owner->add($method, $actionPathBase);
+                    $initializer->name($unnamedActionName);
                 }
             } else {
-                $initializer = $this->owner->addNamed(
+                $initializer = $this->owner->add(
                     $method,
-                    $actionPathBase . '/' . $action,
-                    $action . '_' . $namedActionName
-                );
+                    $actionPathBase . '/' . $action
+                )->name($action . '_' . $namedActionName);
             }
             $initializer->extras(
                 [

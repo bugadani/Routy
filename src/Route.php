@@ -4,6 +4,7 @@ namespace Routy;
 
 use Routy\Invokers\NamedParameterDelegate;
 use Routy\Invokers\DelegateInterface;
+use Routy\Invokers\NullDelegate;
 
 class Route
 {
@@ -43,7 +44,7 @@ class Route
      */
     public function getCallback()
     {
-        return $this->onMatch;
+        return $this->onMatch ?: NullDelegate::get();
     }
 
     /**

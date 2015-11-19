@@ -3,81 +3,148 @@
 namespace Routy\Test;
 
 use Routy\Configuration;
-use Routy\Exceptions\MethodNotAllowed;
 use Routy\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function testShortGetRequest()
+    public function requestProvider()
     {
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['REQUEST_URI']    = '/some/query?other=parameter';
-        $_GET                      = [
-            'other' => 'parameter'
+        return [
+            'get with extra parameters' => [
+                'request'     => [
+                    'SERVER' => [
+                        'REQUEST_METHOD' => 'GET',
+                        'REQUEST_URI'    => '/some/query?other=parameter'
+                    ],
+                    'GET'    => ['other' => 'parameter']
+                ],
+                'config'      => [],
+                'expectation' => [
+                    'method' => 'GET',
+                    'path'   => '/some/query',
+                    'extras' => [
+                        'other' => 'parameter'
+                    ]
+                ]
+            ],
+            'simple post'               => [
+                'request'     => [
+                    'SERVER' => [
+                        'REQUEST_METHOD' => 'POST',
+                        'REQUEST_URI'    => '/some/query'
+                    ]
+                ],
+                'config'      => [],
+                'expectation' => [
+                    'method' => 'POST',
+                    'path'   => '/some/query',
+                    'extras' => []
+                ]
+            ],
+            'emulated put'              => [
+                'request'     => [
+                    'SERVER' => [
+                        'REQUEST_METHOD' => 'POST',
+                        'REQUEST_URI'    => '/some/query'
+                    ],
+                    'POST'   => [
+                        '_method' => 'PUT'
+                    ]
+                ],
+                'config'      => [],
+                'expectation' => [
+                    'method' => 'PUT',
+                    'path'   => '/some/query',
+                    'extras' => []
+                ]
+            ],
+            'get when no short urls'    => [
+                'request'     => [
+                    'SERVER' => [
+                        'REQUEST_METHOD' => 'GET',
+                        'REQUEST_URI'    => 'index.php?q=/some/query&other=parameter'
+                    ],
+                    'GET'    => [
+                        'q'     => '/some/query',
+                        'other' => 'parameter'
+                    ]
+                ],
+                'config'      => [
+                    'useShortUrls' => false,
+                    'pathKey'      => 'q'
+                ],
+                'expectation' => [
+                    'method' => 'GET',
+                    'path'   => '/some/query',
+                    'extras' => [
+                        'other' => 'parameter'
+                    ]
+                ]
+            ]
         ];
-
-        $request = Request::fromCurrentRequest();
-
-        $this->assertEquals('GET', $request->getMethod());
-        $this->assertEquals('/some/query', $request->getPath());
     }
 
-    public function testNotShortGetRequest()
+    /**
+     * @param $config
+     * @return null|Configuration
+     */
+    private function createConfiguration(array $config)
     {
-        $_SERVER['REQUEST_METHOD'] = 'GET';
+        if (!empty($config)) {
+            $configuration = new Configuration();
+            foreach ($config as $k => $v) {
+                $configuration->$k = $v;
+            }
+        } else {
+            $configuration = null;
+        }
 
-        $_GET = [
-            'q'     => '/some/query',
-            'other' => 'parameter'
-        ];
-
-        $config               = new Configuration();
-        $config->useShortUrls = false;
-        $config->pathKey      = 'q';
-
-        $request = Request::fromCurrentRequest($config);
-
-        $this->assertEquals('GET', $request->getMethod());
-        $this->assertEquals('/some/query', $request->getPath());
+        return $configuration;
     }
 
-    public function testPostRequest()
+    /**
+     * @dataProvider requestProvider
+     */
+    public function testFromCurrentRequest($request, $config, $expectation)
     {
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_SERVER['REQUEST_URI']    = '/some/query';
+        $_SERVER = isset($request['SERVER']) ? $request['SERVER'] : [];
+        $_GET    = isset($request['GET']) ? $request['GET'] : [];
+        $_POST   = isset($request['POST']) ? $request['POST'] : [];
 
-        $request = Request::fromCurrentRequest();
+        $configuration = $this->createConfiguration($config);
 
-        $this->assertEquals('POST', $request->getMethod());
-        $this->assertEquals('/some/query', $request->getPath());
-    }
+        $req = Request::fromCurrentRequest($configuration);
 
-    public function testEmulatedPutRequest()
-    {
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_SERVER['REQUEST_URI']    = '/some/query';
-        $_POST['_method']          = 'PUT';
-
-        $request = Request::fromCurrentRequest();
-
-        $this->assertEquals('PUT', $request->getMethod());
-        $this->assertEquals('/some/query', $request->getPath());
+        $this->assertEquals($expectation['method'], $req->getMethod());
+        $this->assertEquals($expectation['path'], $req->getPath());
+        $this->assertEquals($expectation['extras'], $req->getExtras());
     }
 
     /**
      * @expectedException \Routy\Exceptions\MethodNotAllowed
      */
-    public function testEmulatedRequestException()
+    public function testEmulateDisallowedRequestThrowsException()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI']    = '/some/query';
         $_POST['_method']          = 'PUT';
 
-        $config = new Configuration();
-        $config->emulatedMethods = ['DELETE'];
-        $request = Request::fromCurrentRequest($config);
+        $config                  = new Configuration();
+        $config->emulatedMethods = ['DELETE', 'GET'];
+        Request::fromCurrentRequest($config);
+    }
 
-        $this->assertEquals('PUT', $request->getMethod());
-        $this->assertEquals('/some/query', $request->getPath());
+    /**
+     * @expectedException \Routy\Exceptions\MethodNotAllowed
+     */
+    public function testEmulateDisallowedRequestWhenTheMethodMatchesThrowsException()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI']    = '/some/query';
+        $_POST['_method']          = 'PUT';
+
+        $config                  = new Configuration();
+        $config->emulatedMethods = ['POST'];
+        Request::fromCurrentRequest($config);
     }
 }

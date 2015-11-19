@@ -29,7 +29,7 @@ class RouteMatcher
             if ($route->isStatic()) {
                 if ($route->isPath($request->getPath())) {
                     if ($route->isMethod($request->getMethod())) {
-                        return new Match($route, $request->getExtras());
+                        return $this->createMatch($route, $request->getExtras());
                     } else {
                         $otherMethodMatched = true;
                     }
@@ -55,8 +55,7 @@ class RouteMatcher
                             $route->getParsed()->getParameterNames(),
                             $params
                         );
-
-                        return new Match($route, $parameters + $request->getExtras());
+                        return $this->createMatch($route, $parameters + $request->getExtras());
                     } else {
                         $otherMethodMatched = true;
                     }
@@ -69,6 +68,15 @@ class RouteMatcher
         } else {
             throw new NotFound("Route not found: {$request->getPath()}");
         }
+    }
+
+    private function createMatch(Route $route, array $params)
+    {
+        $match = new Match($route, $params);
+        $callback = $route->getCallback();
+        $callback->invoke($match);
+
+        return $match;
     }
 
     private function matchVariableRouteChunk($path, $routesMap)

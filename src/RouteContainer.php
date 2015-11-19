@@ -2,8 +2,6 @@
 
 namespace Routy;
 
-use Routy\Initializers\RouteInitializer;
-
 /**
  * RouteContainer contains references to the routes used by Routy.
  */
@@ -35,28 +33,20 @@ class RouteContainer implements \IteratorAggregate
         $method = $route->getMethod();
 
         if (!isset($this->pathMethodMap[ $path ])) {
-            $this->pathMethodMap[ $path ] = [$method];
-        } else {
-            if (in_array($method, $this->pathMethodMap[ $path ])) {
-                throw new \InvalidArgumentException("Method {$method} is already defined for {$path}");
+            $this->pathMethodMap[ $path ] = [];
+        } else if (in_array($method, $this->pathMethodMap[ $path ])) {
+            throw new \InvalidArgumentException("Method {$method} is already defined for {$path}");
+        }
+
+        $name = $route->getName();
+        if ($name !== null) {
+            if (isset($this->routeNames[ $name ])) {
+                throw new \InvalidArgumentException("Route {$name} is already defined");
             }
-            $this->pathMethodMap[ $path ][] = $method;
+            $this->routeNames[ $name ] = $route;
         }
+        $this->pathMethodMap[ $path ][] = $method;
         $this->routes->attach($route);
-
-        return new RouteInitializer($this, $route);
-    }
-
-    public function addNamed($name, Route $route)
-    {
-        if (!$this->routes->contains($route)) {
-            $this->add($route);
-        }
-
-        if (isset($this->routeNames[ $name ])) {
-            throw new \InvalidArgumentException("Route {$name} is already defined");
-        }
-        $this->routeNames[ $name ] = $route;
     }
 
     /**

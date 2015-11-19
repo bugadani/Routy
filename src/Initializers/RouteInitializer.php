@@ -39,9 +39,13 @@ class RouteInitializer implements RouteInitializerInterface
 
     public function name($name)
     {
-        $this->container->addNamed($name, $this->route);
         $this->route->setName($name);
 
         return $this;
+    }
+
+    public function __destruct()
+    {
+        $this->container->add($this->route);
     }
 }

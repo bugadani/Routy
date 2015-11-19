@@ -3,6 +3,7 @@
 namespace Routy;
 
 use Routy\Initializers\AggregateRouteInitializer;
+use Routy\Initializers\RouteInitializer;
 use Routy\Resources\PluralResourceGenerator;
 use Routy\Resources\SingularResourceGenerator;
 
@@ -54,22 +55,17 @@ class Router
         $methods          = explode('|', $method);
         $initializerArray = [];
         foreach ($methods as $method) {
-            $initializerArray[] = $this->routeContainer->add(new Route($method, $routeData));
+            $initializerArray[] =  new RouteInitializer($this->routeContainer, new Route($method, $routeData));
         }
 
         return new AggregateRouteInitializer($initializerArray);
     }
 
-    public function addNamed($method, $path, $name)
-    {
-        return $this->createRoute($method, $path)->name($name);
-    }
-
     private function createRoute($method, $path)
     {
-        $parsedPath = $this->routeParser->parse($path);
+        $routeData = $this->routeParser->parse($path);
 
-        return $this->routeContainer->add(new Route($method, $parsedPath));
+        return new RouteInitializer($this->routeContainer, new Route($method, $routeData));
     }
 
     public function get($path)
@@ -122,16 +118,7 @@ class Router
 
     public function match(Request $request)
     {
-        $match = $this->routeMatcher->match($request);
-
-        $route    = $match->getRoute();
-        $callback = $route->getCallback();
-
-        if ($callback !== null) {
-            $callback->invoke($match);
-        }
-
-        return $match;
+        return $this->routeMatcher->match($request);
     }
 
     public function to($routeName, $parameters = [])
