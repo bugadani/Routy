@@ -77,3 +77,10 @@ must be supplied as the second argument, and extra ones will be appended to the 
 
 Routy supports [Rails-like](http://guides.rubyonrails.org/routing.html#resource-routing-the-rails-default) resources.
 A resource can be defined by using `resource($name)`, or `resources($singularName, $pluralName)`.
+
+### Notes on HHVM
+
+Routy is tested on HHVM 3.6.6 and it is found that the basic function of the library works with one exception:
+Since route generation happens in an object's destructor, any exception thrown in there will crash the whole script.
+This is not an issue in PHP, but the HHVM actually issues a fatal error in this case, which makes the thrown exceptions
+fatal and not catchable.
