@@ -17,9 +17,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Routy\\": "src/",
-      "Routy\\Test\\": "test/"
+      "Routy\\": "src/"
     },
     "files": ["src/functions.php"]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Routy\\Test\\": "test/"
+    }
   }
 }

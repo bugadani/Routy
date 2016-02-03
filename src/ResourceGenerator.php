@@ -20,14 +20,14 @@ abstract class ResourceGenerator
 
     private $shallow;
     private $shallowPrefix = '';
-    private $shallowPath = '';
-    private $isChild = false;
+    private $shallowPath   = '';
+    private $isChild       = false;
 
     /**
      * @var ResourceGenerator[]
      */
     protected $children = [];
-    private $onMatch;
+    private   $onMatch;
 
     public function __construct(Router $owner)
     {
@@ -43,6 +43,7 @@ abstract class ResourceGenerator
 
     /**
      * @param $except
+     *
      * @return $this
      */
     public function except($except)
@@ -56,6 +57,7 @@ abstract class ResourceGenerator
 
     /**
      * @param $only
+     *
      * @return $this
      */
     public function only($only)

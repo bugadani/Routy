@@ -8,9 +8,9 @@ namespace Routy;
 class RouteContainer implements \IteratorAggregate
 {
     /**
-     * @var \SplObjectStorage
+     * @var Route[]
      */
-    private $routes;
+    private $routes = [];
 
     /**
      * @var Route[]
@@ -21,11 +21,6 @@ class RouteContainer implements \IteratorAggregate
      * @var array
      */
     private $pathMethodMap = [];
-
-    public function __construct()
-    {
-        $this->routes = new \SplObjectStorage();
-    }
 
     public function add(Route $route)
     {
@@ -46,11 +41,12 @@ class RouteContainer implements \IteratorAggregate
             $this->routeNames[ $name ] = $route;
         }
         $this->pathMethodMap[ $path ][] = $method;
-        $this->routes->attach($route);
+        $this->routes[]                 = $route;
     }
 
     /**
      * @param $name
+     *
      * @return Route
      */
     public function get($name)
@@ -63,6 +59,6 @@ class RouteContainer implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return $this->routes;
+        return new \ArrayIterator($this->routes);
     }
 }
