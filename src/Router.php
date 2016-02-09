@@ -50,7 +50,7 @@ class Router
 
     public function add($method, $path)
     {
-        $routeData = $this->routeParser->parse($path);
+        $routeData = $this->routeParser->parse($this->configuration->basePath . $path);
 
         $methods          = explode('|', $method);
         $initializerArray = [];
@@ -63,7 +63,7 @@ class Router
 
     private function createRoute($method, $path)
     {
-        $routeData = $this->routeParser->parse($path);
+        $routeData = $this->routeParser->parse($this->configuration->basePath . $path);
 
         return new RouteInitializer($this->routeContainer, $method, $routeData);
     }

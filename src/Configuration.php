@@ -59,4 +59,11 @@ class Configuration
      * @var string
      */
     public $defaultParameterPattern = '[^/]+';
+
+    /**
+     * The default format used to match parameters
+     *
+     * @var string
+     */
+    public $basePath = '';
 }

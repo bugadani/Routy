@@ -179,10 +179,35 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                );
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['REQUEST_URI'] = 'hello?extra=foobar';
-        $_GET['extra'] = 'foobar';
+        $_SERVER['REQUEST_URI']    = 'hello?extra=foobar';
+        $_GET['extra']             = 'foobar';
 
         $router->matchCurrentRequest();
         $this->assertTrue($called);
+    }
+
+    public function testBasePath()
+    {
+        $called = false;
+
+        $config           = new Configuration();
+        $config->basePath = 'base/';
+
+        $router = new Router($config);
+        $router->get('hello')
+               ->name('hello')
+               ->onMatch(
+                   function () use (&$called) {
+                       $called = true;
+                   }
+               );
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI']    = 'base/hello';
+
+        $router->matchCurrentRequest();
+        $this->assertTrue($called);
+
+        $this->assertEquals('base/hello', $router->to('hello'));
     }
 }
