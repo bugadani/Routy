@@ -4,7 +4,12 @@ namespace Routy;
 
 function call_user_func_named(callable $callable, array $arguments)
 {
-    $reflection = new \ReflectionFunction($callable);
+    if (is_array($callable)) {
+        list($object, $method) = $callable;
+        $reflection = new \ReflectionMethod($object, $method);
+    } else {
+        $reflection = new \ReflectionFunction($callable);
+    }
 
     $args = [];
     foreach ($reflection->getParameters() as $param) {
