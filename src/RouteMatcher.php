@@ -4,6 +4,7 @@ namespace Routy;
 
 use Routy\Exceptions\MethodNotAllowed;
 use Routy\Exceptions\NotFound;
+use Routy\Invokers\DelegateInterface;
 
 class RouteMatcher
 {
@@ -13,10 +14,15 @@ class RouteMatcher
      * @var RouteContainer
      */
     private $routeContainer;
+    /**
+     * @var Configuration
+     */
+    private $configuration;
 
-    public function __construct(RouteContainer $routeContainer)
+    public function __construct(RouteContainer $routeContainer, Configuration $configuration)
     {
         $this->routeContainer = $routeContainer;
+        $this->configuration  = $configuration;
     }
 
     public function match(Request $request)
@@ -55,6 +61,7 @@ class RouteMatcher
                             $route->getParsed()->getParameterNames(),
                             $params
                         );
+
                         return $this->createMatch($route, $parameters + $request->getExtras());
                     } else {
                         $otherMethodMatched = true;
@@ -72,9 +79,14 @@ class RouteMatcher
 
     private function createMatch(Route $route, array $params)
     {
-        $match = new Match($route, $params);
+        $match    = new Match($route, $params);
         $callback = $route->getCallback();
-        $callback->invoke($match);
+        if ($callback === null) {
+            $callback = $this->configuration->defaultMatchCallback;
+        }
+        if ($callback instanceof DelegateInterface) {
+            $callback->invoke($match);
+        }
 
         return $match;
     }
@@ -115,6 +127,7 @@ class RouteMatcher
      *
      * @param $parameterNames
      * @param $params
+     *
      * @return array
      */
     private function mapOrderedParametersToNames($parameterNames, $params)
@@ -127,6 +140,7 @@ class RouteMatcher
 
     /**
      * @param Route[] $variableRoutes
+     *
      * @return array
      */
     private function groupRoutesByPattern($variableRoutes)

@@ -2,6 +2,9 @@
 
 namespace Routy;
 
+use Routy\Invokers\DelegateInterface;
+use Routy\Invokers\NullDelegate;
+
 class Configuration
 {
     /**
@@ -66,4 +69,16 @@ class Configuration
      * @var string
      */
     public $basePath = '';
+
+    /**
+     * The default route match handler
+     *
+     * @var DelegateInterface
+     */
+    public $defaultMatchCallback;
+
+    public function __construct()
+    {
+        $this->defaultMatchCallback = NullDelegate::get();
+    }
 }

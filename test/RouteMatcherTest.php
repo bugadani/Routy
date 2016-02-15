@@ -2,6 +2,7 @@
 
 namespace Routy\Test;
 
+use Routy\Configuration;
 use Routy\Request;
 use Routy\Route;
 use Routy\RouteContainer;
@@ -26,7 +27,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
         $routes->add($routeA);
         $routes->add($routeB);
 
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $match = $matcher->match(new Request(Request::METHOD_GET, 'path'));
 
@@ -45,7 +46,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
 
         $routes = new RouteContainer();
         $routes->add($routeA);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
         $matcher->match(new Request(Request::METHOD_POST, 'path'));
     }
 
@@ -61,7 +62,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
 
         $routes = new RouteContainer();
         $routes->add($routeA);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $matcher->match(new Request(Request::METHOD_POST, 'something'));
     }
@@ -75,7 +76,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
 
         $routes = new RouteContainer();
         $routes->add($routeA);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $match = $matcher->match(new Request(Request::METHOD_GET, 'path/5'));
 
@@ -97,7 +98,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
         $routes->add($routeA);
         $routes->add($routeB);
 
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $match = $matcher->match(new Request(Request::METHOD_GET, 'path/1'));
 
@@ -116,7 +117,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
 
         $routes = new RouteContainer();
         $routes->add($routeA);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $matcher->match(new Request(Request::METHOD_POST, 'path/5'));
     }
@@ -133,7 +134,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
 
         $routes = new RouteContainer();
         $routes->add($routeA);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $matcher->match(new Request(Request::METHOD_GET, 'path/b'));
     }
@@ -146,7 +147,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
         $routes = new RouteContainer();
         $routes->add($routeA);
         $routes->add($routeB);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $match = $matcher->match(new Request(Request::METHOD_GET, 'path'));
         $this->assertSame($routeA, $match->getRoute());
@@ -163,7 +164,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
         $routes = new RouteContainer();
         $routes->add($routeA);
         $routes->add($routeB);
-        $matcher = new RouteMatcher($routes);
+        $matcher = new RouteMatcher($routes, new Configuration());
 
         $match = $matcher->match(new Request(Request::METHOD_GET, 'path/a'));
         $this->assertSame($routeA, $match->getRoute());

@@ -68,7 +68,7 @@ class Route
      */
     public function getCallback()
     {
-        return $this->onMatch ?: NullDelegate::get();
+        return $this->onMatch ?: null;
     }
 
     /**

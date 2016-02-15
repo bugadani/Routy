@@ -44,7 +44,7 @@ class Router
         $this->routeParser    = $config->routeParser ?: new RouteParser();
         $this->routeContainer = $config->routeContainer ?: new RouteContainer();
 
-        $this->routeMatcher   = new RouteMatcher($this->routeContainer);
+        $this->routeMatcher   = new RouteMatcher($this->routeContainer, $config);
         $this->routeGenerator = new RouteGenerator($this->routeContainer, $config);
     }
 
